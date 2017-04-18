@@ -5,6 +5,7 @@
 import app from '../app';
 import { log } from '../util/logger';
 import http from 'http';
+import { init } from '../bootstrap/init';
 
 /**
  * Get port from environment and store in Express.
@@ -83,4 +84,6 @@ function onListening() {
         ? 'pipe ' + addr
         : 'port ' + addr.port;
     log('Server', 'Listening on ' + bind);
+
+    init();
 }
