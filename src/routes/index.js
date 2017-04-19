@@ -2,6 +2,7 @@ import express from 'express';
 const router = express.Router();
 
 import userRoutes from './users';
+import sessionRoutes from './session';
 
 router.get('/', (req, res) => {
     res.send({
@@ -10,5 +11,6 @@ router.get('/', (req, res) => {
 });
 
 router.use('/users', userRoutes);
+router.use('/session', sessionRoutes);
 
 export default router;

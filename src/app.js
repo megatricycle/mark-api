@@ -4,8 +4,12 @@ import favicon from 'serve-favicon';
 import logger from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
+import passport from 'passport';
+import session from 'express-session';
 
+import * as passportLocalStrategy from './passport/local';
 import routes from './routes/index';
+import { log } from './util/logger';
 
 const app = express();
 
@@ -14,6 +18,18 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(
+    session({
+        secret: 'nova_romania_system_321',
+        resave: false,
+        saveUninitialized: false
+    })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passportLocalStrategy.init();
 
 app.use(routes);
 
@@ -30,6 +46,10 @@ app.use((req, res, next) => {
 // will print stacktrace
 if (app.get('env') === 'development') {
     app.use((err, req, res) => {
+        if (typeof err.status === 'undefined' || err.status >= 500) {
+            log('Error', err);
+        }
+
         res.status(err.status || 500);
         res.send({
             message: err.message,
@@ -41,6 +61,10 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use((err, req, res) => {
+    if (err.status === 'undefined' && err.status >= 500) {
+        log('Error', err);
+    }
+
     res.status(err.status || 500);
     res.send({
         message: err.message,
