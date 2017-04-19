@@ -1,33 +1,46 @@
 import passport from 'passport';
 
-import { invalidCredentials, forbidden } from '../constants/errorTypes';
+import {
+    validationError,
+    invalidCredentials,
+    forbidden
+} from '../constants/errorTypes';
 import { log } from '../util/logger';
 
 export const login = (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) {
-            return next(err);
+    req.checkBody('username').notEmpty().isAscii();
+    req.checkBody('password').notEmpty().isAscii();
+
+    req.getValidationResult().then(result => {
+        if (!result.isEmpty()) {
+            return next(validationError(result));
         }
 
-        if (!user) {
-            return next(invalidCredentials(info.message));
-        }
-
-        req.logIn(user, err => {
+        passport.authenticate('local', (err, user, info) => {
             if (err) {
                 return next(err);
             }
 
-            res.send({
-                message: 'Successfully logged in.',
-                id: req.user.id,
-                username: req.user.username,
-                userType: req.user.userType
-            });
+            if (!user) {
+                return next(invalidCredentials(info.message));
+            }
 
-            log('User', `User "${req.user.username}" logged in.`);
-        });
-    })(req, res, next);
+            req.logIn(user, err => {
+                if (err) {
+                    return next(err);
+                }
+
+                res.send({
+                    message: 'Successfully logged in.',
+                    id: req.user.id,
+                    username: req.user.username,
+                    userType: req.user.userType
+                });
+
+                log('User', `User "${req.user.username}" logged in.`);
+            });
+        })(req, res, next);
+    });
 };
 
 export const logout = (req, res, next) => {

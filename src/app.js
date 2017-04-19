@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import passport from 'passport';
 import session from 'express-session';
+import expressValidator from 'express-validator';
 
 import * as passportLocalStrategy from './passport/local';
 import routes from './routes/index';
@@ -16,6 +17,7 @@ const app = express();
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
+app.use(expressValidator());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(
@@ -45,7 +47,8 @@ app.use((req, res, next) => {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use((err, req, res) => {
+    // prettier-ignore
+    app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
         if (typeof err.status === 'undefined' || err.status >= 500) {
             log('Error', err);
         }
@@ -60,7 +63,8 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use((err, req, res) => {
+// prettier-ignore
+app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
     if (err.status === 'undefined' && err.status >= 500) {
         log('Error', err);
     }

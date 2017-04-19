@@ -11,9 +11,12 @@ export const missingFields = result => {
     };
 };
 
-export const validationError = {
-    status: 422,
-    message: 'VALIDATION_ERROR'
+export const validationError = result => {
+    return {
+        status: 422,
+        message: 'VALIDATION_ERROR',
+        fields: result.array()
+    };
 };
 
 export const invalidCredentials = info => {

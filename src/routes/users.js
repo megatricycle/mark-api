@@ -3,7 +3,6 @@ const router = express.Router();
 
 import * as userController from '../controllers/users';
 
-/* GET users listing. */
-router.get('/', userController.getAll);
+router.post('/signup', userController.signup);
 
 export default router;

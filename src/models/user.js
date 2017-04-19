@@ -1,4 +1,6 @@
 import Sequelize from 'sequelize';
+
+import * as userTypes from '../constants/userTypes';
 import { hashPassword } from '../util/security';
 import db from '../db/db';
 
@@ -20,7 +22,7 @@ const attributes = {
         allowNull: false
     },
     userType: {
-        type: Sequelize.STRING
+        type: Sequelize.ENUM(userTypes.PROVIDER, userTypes.CONSUMER)
     }
 };
 
