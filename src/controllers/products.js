@@ -1,4 +1,4 @@
-import { Product, User } from '../models';
+import { Product, User, Manual } from '../models';
 import { validationError, resourceNotFound } from '../constants/errorTypes';
 
 export const getProducts = (req, res, next) => {
@@ -81,6 +81,10 @@ export const getProduct = (req, res, next) => {
                     {
                         model: User,
                         attributes: ['id', 'username']
+                    },
+                    {
+                        model: Manual,
+                        attributes: ['id', 'name']
                     }
                 ],
                 limit: 1

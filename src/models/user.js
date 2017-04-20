@@ -38,6 +38,20 @@ const options = {
                 password: hashedPassword.hash,
                 salt: hashedPassword.salt
             });
+        },
+        createUsers(users) {
+            users = users.map(user => {
+                const hashedPassword = hashPassword(user.password);
+
+                return {
+                    username: user.username,
+                    userType: user.userType,
+                    password: hashedPassword.hash,
+                    salt: hashedPassword.salt
+                };
+            });
+
+            return this.bulkCreate(users);
         }
     },
     instanceMethods: {

@@ -1,0 +1,71 @@
+{
+    "users": [{
+        "id": 1,
+        "username": "Samsung",
+        "password": "123123",
+        "userType": "provider"
+    }, {
+        "id": 2,
+        "username": "Apple",
+        "password": "123123",
+        "userType": "provider"
+    }, {
+        "id": 3,
+        "username": "tricycle",
+        "password": "123123",
+        "userType": "consumer"
+    }],
+    "products": [{
+        "id": 1,
+        "userId": 1,
+        "name": "Galaxy S8",
+        "image": "/sampleimage.jpg",
+        "descriptionSummary": "Slick phone.",
+        "descriptionDetail": "Lorem ipsum this is a description."
+    }, {
+        "id": 2,
+        "userId": 1,
+        "name": "Galaxy S9",
+        "image": "/sampleimage.jpg",
+        "descriptionSummary": "Slick phone.",
+        "descriptionDetail": "Lorem ipsum this is a description."
+    }, {
+        "id": 3,
+        "name": "iPhone 6",
+        "userId": 2,
+        "image": "/sampleimage.jpg",
+        "descriptionSummary": "Slick phone.",
+        "descriptionDetail": "Lorem ipsum this is a description."
+    }, {
+        "id": 4,
+        "userId": 2,
+        "name": "MacBook Pro",
+        "image": "/sampleimage.jpg",
+        "descriptionSummary": "Slick laptop.",
+        "descriptionDetail": "Lorem ipsum this is a description."
+    }],
+    "manuals": [{
+        "id": 1,
+        "productId": 1,
+        "name": "Assembling the container",
+        "summary": "This is a sample manual lol."
+    }, {
+        "id": 2,
+        "productId": 1,
+        "name": "Removing the screen",
+        "summary": "This is a sample manual lol."
+    }],
+    "steps": [{
+        "id": 1,
+        "manualId": 1,
+        "instruction": "Step 1 goes here"
+    }, {
+        "id": 2,
+        "manualId": 1,
+        "instruction": "Step 2 goes here"
+    }, {
+        "id": 3,
+        "manualId": 2,
+        "instruction": "But why would you want to remove the screen?"
+    }]
+}
