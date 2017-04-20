@@ -1,4 +1,4 @@
-import { Product, User, Manual } from '../models';
+import { Product, User, Manual, Step } from '../models';
 import { validationError, resourceNotFound } from '../constants/errorTypes';
 
 export const getProducts = (req, res, next) => {
@@ -53,7 +53,6 @@ export const getProducts = (req, res, next) => {
         .catch(err => next(err));
 };
 
-// @TODO: manuals
 export const getProduct = (req, res, next) => {
     req.checkParams('productId').notEmpty();
 
@@ -66,13 +65,14 @@ export const getProduct = (req, res, next) => {
 
             const { productId } = req.params;
 
-            return Product.findAll({
+            return Product.findOne({
                 attributes: [
                     'id',
                     'name',
                     'image',
                     'descriptionSummary',
-                    'descriptionDetail'
+                    'descriptionDetail',
+                    'updatedAt'
                 ],
                 where: {
                     id: productId
@@ -80,14 +80,13 @@ export const getProduct = (req, res, next) => {
                 include: [
                     {
                         model: User,
-                        attributes: ['id', 'username']
+                        attributes: ['id', 'username', 'updatedAt']
                     },
                     {
                         model: Manual,
-                        attributes: ['id', 'name']
+                        attributes: ['id', 'name', 'updatedAt']
                     }
-                ],
-                limit: 1
+                ]
             });
         })
         .then(product => {
@@ -95,7 +94,75 @@ export const getProduct = (req, res, next) => {
                 return Promise.reject(resourceNotFound);
             }
 
-            res.send(product[0]);
+            res.send(product);
+        })
+        .catch(err => next(err));
+};
+
+export const getManual = (req, res, next) => {
+    req.checkParams('productId').notEmpty();
+    req.checkParams('manualId').notEmpty();
+
+    req
+        .getValidationResult()
+        .then(result => {
+            if (!result.isEmpty()) {
+                return Promise.reject(validationError(result));
+            }
+
+            const { productId } = req.params;
+            const { manualId } = req.params;
+
+            return Manual.findOne({
+                attributes: ['id', 'name', 'summary', 'updatedAt'],
+                where: {
+                    id: manualId,
+                    productId
+                },
+                include: [
+                    {
+                        model: Step,
+                        attributes: ['instruction']
+                    }
+                ]
+            });
+        })
+        .then(manual => {
+            res.send(manual);
+        })
+        .catch(err => next(err));
+};
+
+export const addManual = (req, res, next) => {
+    req.checkParams('productId').notEmpty();
+    req.checkBody('name').notEmpty();
+    req.checkBody('summary').notEmpty();
+    req.checkBody('steps').notEmpty();
+
+    req
+        .getValidationResult()
+        .then(result => {
+            if (!result.isEmpty()) {
+                return Promise.reject(validationError(result));
+            }
+
+            const { productId } = req.params;
+            const { name, summary, steps } = req.body;
+
+            return Manual.create(
+                {
+                    name,
+                    summary,
+                    steps,
+                    productId: parseInt(productId)
+                },
+                {
+                    include: [Step]
+                }
+            );
+        })
+        .then(manual => {
+            res.send(manual);
         })
         .catch(err => next(err));
 };

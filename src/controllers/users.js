@@ -64,7 +64,8 @@ export const getProducts = (req, res, next) => {
                     'name',
                     'image',
                     'descriptionSummary',
-                    'descriptionDetail'
+                    'descriptionDetail',
+                    'updatedAt'
                 ]
             });
         })
@@ -121,7 +122,7 @@ export const addProduct = (req, res, next) => {
                 include: [
                     {
                         model: User,
-                        attributes: ['id', 'username']
+                        attributes: ['id', 'username', 'updatedAt']
                     }
                 ]
             });

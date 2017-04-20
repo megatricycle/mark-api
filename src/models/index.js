@@ -5,7 +5,9 @@ import StepModel from './step';
 
 ProductModel.belongsTo(UserModel);
 UserModel.hasMany(ProductModel);
+
 ProductModel.hasMany(ManualModel);
+
 ManualModel.hasMany(StepModel);
 
 export const User = UserModel;
