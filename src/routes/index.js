@@ -3,6 +3,7 @@ const router = express.Router();
 
 import userRoutes from './users';
 import sessionRoutes from './session';
+import productRoutes from './products';
 
 router.get('/', (req, res) => {
     res.send({
@@ -12,5 +13,6 @@ router.get('/', (req, res) => {
 
 router.use('/users', userRoutes);
 router.use('/session', sessionRoutes);
+router.use('/products', productRoutes);
 
 export default router;

@@ -22,4 +22,6 @@ db
         log('DB', 'Database schema reset failed.');
 
         db.close();
+
+        return null;
     });
