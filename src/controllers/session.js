@@ -58,3 +58,11 @@ export const logout = (req, res, next) => {
 
     log('User', `User "${username}" logged out.`);
 };
+
+export const whoami = (req, res) => {
+    if (!req.user) {
+        return res.send({});
+    }
+
+    res.send(req.user);
+};
