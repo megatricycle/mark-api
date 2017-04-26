@@ -38,6 +38,12 @@ fs
         ]);
     })
     .then(() => {
+        return User.findById(3);
+    })
+    .then(user => {
+        return user.addSubscription(2);
+    })
+    .then(() => {
         log('Seed', 'Inserted into database.');
         log('Seed', 'Seeding successful.');
     })

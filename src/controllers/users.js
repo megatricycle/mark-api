@@ -15,7 +15,7 @@ export const signup = (req, res, next) => {
         .getValidationResult()
         .then(result => {
             if (!result.isEmpty()) {
-                return next(validationError(result));
+                return Promise.reject(validationError(result));
             }
 
             const { username, password, userType } = req.body;
@@ -59,6 +59,42 @@ export const getProducts = (req, res, next) => {
             }
 
             return user.getProducts({
+                attributes: [
+                    'id',
+                    'name',
+                    'image',
+                    'descriptionSummary',
+                    'descriptionDetail',
+                    'updatedAt'
+                ]
+            });
+        })
+        .then(products => {
+            res.send(products);
+        })
+        .catch(err => next(err));
+};
+
+export const getSubscriptions = (req, res, next) => {
+    req.checkParams('userId').notEmpty();
+
+    req
+        .getValidationResult()
+        .then(result => {
+            if (!result.isEmpty()) {
+                return Promise.reject(validationError(result));
+            }
+
+            const { userId } = req.params;
+
+            return User.findById(userId);
+        })
+        .then(user => {
+            if (!user) {
+                return Promise.reject(resourceNotFound);
+            }
+
+            return user.getSubscription({
                 attributes: [
                     'id',
                     'name',
@@ -129,6 +165,70 @@ export const addProduct = (req, res, next) => {
         })
         .then(product => {
             res.send(product);
+        })
+        .catch(err => next(err));
+};
+
+export const subscribeToProduct = (req, res, next) => {
+    req.checkParams('userId').notEmpty();
+    req.checkParams('productId').notEmpty();
+
+    req
+        .getValidationResult()
+        .then(result => {
+            if (!result.isEmpty()) {
+                return Promise.reject(validationError(result));
+            }
+
+            const { userId } = req.params;
+
+            return User.findById(userId);
+        })
+        .then(user => {
+            if (!user) {
+                return Promise.reject(resourceNotFound);
+            }
+
+            const { productId } = req.params;
+
+            return user.addSubscription(productId);
+        })
+        .then(() => {
+            res.send({
+                message: 'Successfully subscribed'
+            });
+        })
+        .catch(err => next(err));
+};
+
+export const unsubscribeToProduct = (req, res, next) => {
+    req.checkParams('userId').notEmpty();
+    req.checkParams('productId').notEmpty();
+
+    req
+        .getValidationResult()
+        .then(result => {
+            if (!result.isEmpty()) {
+                return Promise.reject(validationError(result));
+            }
+
+            const { userId } = req.params;
+
+            return User.findById(userId);
+        })
+        .then(user => {
+            if (!user) {
+                return Promise.reject(resourceNotFound);
+            }
+
+            const { productId } = req.params;
+
+            return user.removeSubscription(productId);
+        })
+        .then(() => {
+            res.send({
+                message: 'Successfully unsubscribed'
+            });
         })
         .catch(err => next(err));
 };

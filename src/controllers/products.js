@@ -14,7 +14,7 @@ export const getProducts = (req, res, next) => {
             const { query } = req.query;
 
             const queryFromProducts = Product.findAll({
-                attributes: ['id', 'name', 'image'],
+                attributes: ['id', 'name', 'image', 'updatedAt'],
                 where: {
                     name: {
                         $like: `%${query}%`
@@ -29,7 +29,7 @@ export const getProducts = (req, res, next) => {
             });
 
             const queryFromUsers = Product.findAll({
-                attributes: ['id', 'name', 'image'],
+                attributes: ['id', 'name', 'image', 'updatedAt'],
                 include: [
                     {
                         model: User,
@@ -81,20 +81,41 @@ export const getProduct = (req, res, next) => {
                     {
                         model: User,
                         attributes: ['id', 'username', 'updatedAt']
-                    },
-                    {
-                        model: Manual,
-                        attributes: ['id', 'name', 'updatedAt']
                     }
                 ]
             });
+        })
+        .then(product => {
+            res.send(product);
+        })
+        .catch(err => next(err));
+};
+
+export const getManuals = (req, res, next) => {
+    req.checkParams('productId').notEmpty();
+
+    req
+        .getValidationResult()
+        .then(result => {
+            if (!result.isEmpty()) {
+                return Promise.reject(validationError(result));
+            }
+
+            const { productId } = req.params;
+
+            return Product.findById(productId);
         })
         .then(product => {
             if (!product) {
                 return Promise.reject(resourceNotFound);
             }
 
-            res.send(product);
+            return product.getManuals({
+                attributes: ['id', 'name', 'updatedAt']
+            });
+        })
+        .then(manuals => {
+            res.send(manuals);
         })
         .catch(err => next(err));
 };

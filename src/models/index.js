@@ -6,6 +6,15 @@ import StepModel from './step';
 ProductModel.belongsTo(UserModel);
 UserModel.hasMany(ProductModel);
 
+UserModel.belongsToMany(ProductModel, {
+    through: 'user_product_subscriptions',
+    as: 'Subscription'
+});
+ProductModel.belongsToMany(UserModel, {
+    through: 'user_product_subscriptions',
+    as: 'Subscriber'
+});
+
 ProductModel.hasMany(ManualModel);
 
 ManualModel.hasMany(StepModel);
