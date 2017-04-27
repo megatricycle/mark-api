@@ -58,14 +58,20 @@
     "steps": [{
         "id": 1,
         "manualId": 1,
-        "instruction": "Step 1 goes here"
+        "instruction": "Step 1 goes here",
+        "imageTarget": "target.jpg",
+        "model": "ben"
     }, {
         "id": 2,
         "manualId": 1,
-        "instruction": "Step 2 goes here"
+        "instruction": "Step 2 goes here",
+        "imageTarget": "target.jpg",
+        "model": "ben"
     }, {
         "id": 3,
         "manualId": 2,
-        "instruction": "But why would you want to remove the screen?"
+        "instruction": "But why would you want to remove the screen?",
+        "imageTarget": "target.jpg",
+        "model": "ben"
     }]
 }

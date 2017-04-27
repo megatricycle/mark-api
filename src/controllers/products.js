@@ -143,7 +143,7 @@ export const getManual = (req, res, next) => {
                 include: [
                     {
                         model: Step,
-                        attributes: ['instruction']
+                        attributes: ['instruction', 'imageTarget', 'model']
                     }
                 ]
             });

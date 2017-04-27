@@ -6,6 +6,14 @@ const attributes = {
     instruction: {
         type: Sequelize.STRING,
         allowNull: false
+    },
+    imageTarget: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    model: {
+        type: Sequelize.STRING,
+        allowNull: false
     }
 };
 
