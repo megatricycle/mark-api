@@ -102,6 +102,12 @@ export const getSubscriptions = (req, res, next) => {
                     'descriptionSummary',
                     'descriptionDetail',
                     'updatedAt'
+                ],
+                include: [
+                    {
+                        model: User,
+                        attributes: ['id', 'username']
+                    }
                 ]
             });
         })

@@ -41,7 +41,7 @@ fs
         return User.findById(3);
     })
     .then(user => {
-        return user.addSubscription(2);
+        return user.addSubscription(1);
     })
     .then(() => {
         log('Seed', 'Inserted into database.');
