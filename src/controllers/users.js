@@ -200,8 +200,14 @@ export const subscribeToProduct = (req, res, next) => {
             return user.addSubscription(productId);
         })
         .then(() => {
+            const { productId } = req.params;
+
+            return Product.findById(productId);
+        })
+        .then(product => {
             res.send({
-                message: 'Successfully subscribed'
+                ...product.dataValues,
+                isSubscribed: true
             });
         })
         .catch(err => next(err));
@@ -232,8 +238,14 @@ export const unsubscribeToProduct = (req, res, next) => {
             return user.removeSubscription(productId);
         })
         .then(() => {
+            const { productId } = req.params;
+
+            return Product.findById(productId);
+        })
+        .then(product => {
             res.send({
-                message: 'Successfully unsubscribed'
+                ...product.dataValues,
+                isSubscribed: false
             });
         })
         .catch(err => next(err));
