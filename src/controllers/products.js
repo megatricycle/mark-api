@@ -17,7 +17,7 @@ export const getProducts = (req, res, next) => {
                 attributes: ['id', 'name', 'image', 'updatedAt'],
                 where: {
                     name: {
-                        $like: `%${query}%`
+                        $like: `${query}%`
                     }
                 },
                 include: [
@@ -36,7 +36,7 @@ export const getProducts = (req, res, next) => {
                         attributes: ['id', 'username'],
                         where: {
                             username: {
-                                $like: `%${query}%`
+                                $like: `${query}%`
                             }
                         }
                     }
@@ -48,6 +48,26 @@ export const getProducts = (req, res, next) => {
         .then(([resultFromProducts, resultFromUsers]) => {
             const products = [...resultFromProducts, ...resultFromUsers];
 
+            return Promise.all([
+                User.findById(req.user.id),
+                Promise.resolve(products)
+            ]);
+        })
+        .then(([user, products]) => {
+            const lookupPromise = products.map(product =>
+                user.hasSubscription([product])
+            );
+
+            return Promise.all(lookupPromise).then(lookup => {
+                products = products.map((product, i) => ({
+                    ...product.dataValues,
+                    isSubscribed: lookup[i]
+                }));
+
+                return Promise.resolve(products);
+            });
+        })
+        .then(products => {
             res.send(products);
         })
         .catch(err => next(err));
