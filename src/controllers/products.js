@@ -61,7 +61,8 @@ export const getProducts = (req, res, next) => {
             return Promise.all(lookupPromise).then(lookup => {
                 products = products.map((product, i) => ({
                     ...product.dataValues,
-                    isSubscribed: lookup[i]
+                    isSubscribed: lookup[i],
+                    manuals: []
                 }));
 
                 return Promise.resolve(products);
@@ -75,6 +76,8 @@ export const getProducts = (req, res, next) => {
 
 export const getProduct = (req, res, next) => {
     req.checkParams('productId').notEmpty();
+
+    let product;
 
     req
         .getValidationResult()
@@ -105,7 +108,17 @@ export const getProduct = (req, res, next) => {
                 ]
             });
         })
-        .then(product => {
+        .then(resultProduct => {
+            product = resultProduct;
+
+            return User.findById(req.user.id);
+        })
+        .then(user => {
+            return user.hasSubscription([product]);
+        })
+        .then(result => {
+            product = { ...product.dataValues, isSubscribed: result };
+
             res.send(product);
         })
         .catch(err => next(err));
