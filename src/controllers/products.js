@@ -1,3 +1,5 @@
+import sequelize from 'sequelize';
+
 import { Product, User, Manual, Step } from '../models';
 import { validationError, resourceNotFound } from '../constants/errorTypes';
 
@@ -14,7 +16,16 @@ export const getProducts = (req, res, next) => {
             const { query } = req.query;
 
             const queryFromProducts = Product.findAll({
-                attributes: ['id', 'name', 'image', 'updatedAt'],
+                attributes: [
+                    'id',
+                    'name',
+                    'image',
+                    'updatedAt',
+                    [
+                        sequelize.fn('COUNT', sequelize.col('Subscriber.id')),
+                        'subscribersCount'
+                    ]
+                ],
                 where: {
                     name: {
                         $like: `${query}%`
@@ -24,12 +35,28 @@ export const getProducts = (req, res, next) => {
                     {
                         model: User,
                         attributes: ['id', 'username']
+                    },
+                    {
+                        model: User,
+                        as: 'Subscriber',
+                        required: false,
+                        attributes: []
                     }
-                ]
+                ],
+                group: ['products.id']
             });
 
             const queryFromUsers = Product.findAll({
-                attributes: ['id', 'name', 'image', 'updatedAt'],
+                attributes: [
+                    'id',
+                    'name',
+                    'image',
+                    'updatedAt',
+                    [
+                        sequelize.fn('COUNT', sequelize.col('Subscriber.id')),
+                        'subscribersCount'
+                    ]
+                ],
                 include: [
                     {
                         model: User,
@@ -39,8 +66,15 @@ export const getProducts = (req, res, next) => {
                                 $like: `${query}%`
                             }
                         }
+                    },
+                    {
+                        model: User,
+                        as: 'Subscriber',
+                        required: false,
+                        attributes: []
                     }
-                ]
+                ],
+                group: ['products.id']
             });
 
             return Promise.all([queryFromProducts, queryFromUsers]);
@@ -95,7 +129,11 @@ export const getProduct = (req, res, next) => {
                     'image',
                     'descriptionSummary',
                     'descriptionDetail',
-                    'updatedAt'
+                    'updatedAt',
+                    [
+                        sequelize.fn('COUNT', sequelize.col('Subscriber.id')),
+                        'subscribersCount'
+                    ]
                 ],
                 where: {
                     id: productId
@@ -104,8 +142,15 @@ export const getProduct = (req, res, next) => {
                     {
                         model: User,
                         attributes: ['id', 'username', 'updatedAt']
+                    },
+                    {
+                        model: User,
+                        as: 'Subscriber',
+                        required: false,
+                        attributes: []
                     }
-                ]
+                ],
+                group: ['products.id']
             });
         })
         .then(resultProduct => {

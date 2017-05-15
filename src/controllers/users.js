@@ -1,3 +1,5 @@
+import sequelize from 'sequelize';
+
 import * as userTypes from '../constants/userTypes';
 import { validationError, resourceNotFound } from '../constants/errorTypes';
 import { log } from '../util/logger';
@@ -65,8 +67,21 @@ export const getProducts = (req, res, next) => {
                     'image',
                     'descriptionSummary',
                     'descriptionDetail',
-                    'updatedAt'
-                ]
+                    'updatedAt',
+                    [
+                        sequelize.fn('COUNT', sequelize.col('Subscriber.id')),
+                        'subscribersCount'
+                    ]
+                ],
+                include: [
+                    {
+                        model: User,
+                        as: 'Subscriber',
+                        required: false,
+                        attributes: []
+                    }
+                ],
+                group: ['products.id']
             });
         })
         .then(products => {
@@ -101,14 +116,25 @@ export const getSubscriptions = (req, res, next) => {
                     'image',
                     'descriptionSummary',
                     'descriptionDetail',
-                    'updatedAt'
+                    'updatedAt',
+                    [
+                        sequelize.fn('COUNT', sequelize.col('Subscriber.id')),
+                        'subscribersCount'
+                    ]
                 ],
                 include: [
                     {
                         model: User,
                         attributes: ['id', 'username']
+                    },
+                    {
+                        model: User,
+                        as: 'Subscriber',
+                        required: false,
+                        attributes: []
                     }
-                ]
+                ],
+                group: ['products.id']
             });
         })
         .then(products => {
