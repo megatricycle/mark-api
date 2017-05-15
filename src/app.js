@@ -22,7 +22,10 @@ app.use(expressValidator());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-const originWhitelist = ['http://localhost:3000'];
+const originWhitelist = [
+    'http://localhost:3000',
+    'chrome-extension://fhbjgbiflinjbdggehcddcbncdddomop'
+];
 
 app.use(
     cors({

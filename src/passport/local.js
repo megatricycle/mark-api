@@ -3,25 +3,33 @@ import { User } from '../models';
 import { hashPasswordWithSalt } from '../util/security';
 import { Strategy as LocalStrategy } from 'passport-local';
 
-export const strategy = new LocalStrategy((username, password, done) => {
-    User.findOne({
-        where: {
-            username: username
-        }
-    }).then(user => {
-        if (user === null) {
+export const strategy = new LocalStrategy(
+    {
+        passReqToCallback: true
+    },
+    (req, username, password, done) => {
+        const { userType } = req.body;
+
+        User.findOne({
+            where: {
+                username,
+                userType
+            }
+        }).then(user => {
+            if (user === null) {
+                return done(null, false, { message: 'Incorrect credentials.' });
+            }
+
+            var hashedPassword = hashPasswordWithSalt(password, user.salt);
+
+            if (user.password === hashedPassword) {
+                return done(null, user);
+            }
+
             return done(null, false, { message: 'Incorrect credentials.' });
-        }
-
-        var hashedPassword = hashPasswordWithSalt(password, user.salt);
-
-        if (user.password === hashedPassword) {
-            return done(null, user);
-        }
-
-        return done(null, false, { message: 'Incorrect credentials.' });
-    });
-});
+        });
+    }
+);
 
 export function serialize(user, done) {
     done(null, user.id);

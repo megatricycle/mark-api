@@ -10,6 +10,7 @@ import { log } from '../util/logger';
 export const login = (req, res, next) => {
     req.checkBody('username').notEmpty().isAscii();
     req.checkBody('password').notEmpty().isAscii();
+    req.checkBody('userType').notEmpty().isAscii();
 
     req.getValidationResult().then(result => {
         if (!result.isEmpty()) {
