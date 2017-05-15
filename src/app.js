@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import passport from 'passport';
 import session from 'express-session';
 import expressValidator from 'express-validator';
+import cors from 'cors';
 
 import * as passportLocalStrategy from './passport/local';
 import routes from './routes/index';
@@ -20,6 +21,21 @@ app.use(bodyParser.json());
 app.use(expressValidator());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+const originWhitelist = ['http://localhost:3000'];
+
+app.use(
+    cors({
+        credentials: true,
+        origin: (origin, cb) => {
+            if (originWhitelist.filter(o => o === origin).length > 0) {
+                cb(null, true);
+            } else {
+                cb(new Error('Not allowed by CORS'));
+            }
+        }
+    })
+);
 app.use(
     session({
         secret: 'nova_romania_system_321',
