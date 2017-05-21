@@ -149,8 +149,10 @@ export const getSubscriptions = (req, res, next) => {
         .catch(err => next(err));
 };
 
-// @TODO: image
+// @TODO: image validation
 export const addProduct = (req, res, next) => {
+    const { filename: imageFilename } = req.file;
+
     req.checkParams('userId').notEmpty();
     req.checkBody('name').notEmpty();
     req.checkBody('descriptionSummary').notEmpty();
@@ -176,7 +178,7 @@ export const addProduct = (req, res, next) => {
 
             return user.createProduct({
                 name,
-                image: '/sampleimage.jpg',
+                image: '/images/' + imageFilename,
                 descriptionSummary,
                 descriptionDetail
             });

@@ -22,10 +22,7 @@ app.use(expressValidator());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-const originWhitelist = [
-    'http://localhost:3000',
-    'chrome-extension://fhbjgbiflinjbdggehcddcbncdddomop'
-];
+const originWhitelist = ['http://localhost:3000', 'http://localhost:8000'];
 
 app.use(
     cors({
@@ -51,6 +48,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passportLocalStrategy.init();
+
+app.use(express.static(__dirname + '/public'));
 
 app.use(routes);
 
