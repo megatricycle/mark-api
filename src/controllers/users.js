@@ -29,13 +29,19 @@ export const signup = (req, res, next) => {
             });
         })
         .then(user => {
-            log(
-                'User',
-                `User ${user.username} has signed up with type ${user.userType}.`
-            );
-            res.send({
-                message: 'Successfully created user.',
-                user
+            req.logIn(user, err => {
+                if (err) {
+                    return next(err);
+                }
+
+                log(
+                    'User',
+                    `User ${user.username} has signed up with type ${user.userType}.`
+                );
+                res.send({
+                    message: 'Successfully created user.',
+                    user
+                });
             });
         })
         .catch(err => next(err));
