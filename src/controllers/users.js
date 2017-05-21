@@ -190,7 +190,11 @@ export const addProduct = (req, res, next) => {
                     'name',
                     'image',
                     'descriptionSummary',
-                    'descriptionDetail'
+                    'descriptionDetail',
+                    [
+                        sequelize.fn('COUNT', sequelize.col('Subscriber.id')),
+                        'subscribersCount'
+                    ]
                 ],
                 where: {
                     id: product.id
@@ -199,8 +203,15 @@ export const addProduct = (req, res, next) => {
                     {
                         model: User,
                         attributes: ['id', 'username', 'updatedAt']
+                    },
+                    {
+                        model: User,
+                        as: 'Subscriber',
+                        required: false,
+                        attributes: []
                     }
-                ]
+                ],
+                group: ['products.id']
             });
         })
         .then(product => {
