@@ -57,21 +57,29 @@
     }],
     "steps": [{
         "id": 1,
+        "index": 0,
         "manualId": 1,
         "instruction": "Step 1 goes here",
-        "imageTarget": "target.jpg",
-        "model": "ben"
+        "imageTarget": "target.jpg"
     }, {
         "id": 2,
+        "index": 1,
         "manualId": 1,
         "instruction": "Step 2 goes here",
-        "imageTarget": "target.jpg",
-        "model": "ben"
+        "imageTarget": "target.jpg"
     }, {
         "id": 3,
+        "index": 0,
         "manualId": 2,
         "instruction": "But why would you want to remove the screen?",
-        "imageTarget": "target.jpg",
-        "model": "ben"
+        "imageTarget": "target.jpg"
+    }],
+    "objectModels": [{
+        "id": 1,
+        "stepId": 1,
+        "type": "arrow",
+        "x": 0,
+        "y": 0,
+        "z": 0
     }]
 }

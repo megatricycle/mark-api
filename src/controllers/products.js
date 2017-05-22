@@ -1,6 +1,6 @@
 import sequelize from 'sequelize';
 
-import { Product, User, Manual, Step } from '../models';
+import { Product, User, Manual, Step, ObjectModel } from '../models';
 import { validationError, resourceNotFound } from '../constants/errorTypes';
 
 export const getProducts = (req, res, next) => {
@@ -221,7 +221,8 @@ export const getManual = (req, res, next) => {
                 include: [
                     {
                         model: Step,
-                        attributes: ['instruction', 'imageTarget', 'model']
+                        attributes: ['instruction', 'imageTarget'],
+                        include: [ObjectModel]
                     }
                 ]
             });
@@ -236,7 +237,6 @@ export const addManual = (req, res, next) => {
     req.checkParams('productId').notEmpty();
     req.checkBody('name').notEmpty();
     req.checkBody('summary').notEmpty();
-    req.checkBody('steps').notEmpty();
 
     req
         .getValidationResult()
@@ -246,19 +246,141 @@ export const addManual = (req, res, next) => {
             }
 
             const { productId } = req.params;
-            const { name, summary, steps } = req.body;
+            const { name, summary } = req.body;
 
-            return Manual.create(
-                {
-                    name,
-                    summary,
-                    steps,
-                    productId: parseInt(productId)
+            return Manual.create({
+                name,
+                summary,
+                productId: parseInt(productId)
+            });
+        })
+        .then(manual => {
+            const { productId } = req.params;
+
+            return Manual.findOne({
+                attributes: ['id', 'name', 'summary', 'updatedAt'],
+                where: {
+                    id: manual.id,
+                    productId
                 },
-                {
-                    include: [Step]
+                include: [
+                    {
+                        model: Step,
+                        attributes: ['instruction', 'imageTarget'],
+                        include: [ObjectModel]
+                    }
+                ]
+            });
+        })
+        .then(manual => {
+            res.send(manual);
+        })
+        .catch(err => next(err));
+};
+
+export const editManual = (req, res, next) => {
+    req.checkParams('productId').notEmpty();
+    req.checkParams('manualId').notEmpty();
+
+    req
+        .getValidationResult()
+        .then(result => {
+            if (!result.isEmpty()) {
+                return Promise.reject(validationError(result));
+            }
+
+            const { productId, manualId } = req.params;
+
+            return Manual.findOne({
+                where: {
+                    id: manualId,
+                    productId
                 }
-            );
+            });
+        })
+        .then(manual => {
+            const { name, summary } = req.body;
+
+            if (name) {
+                manual.name = name;
+            }
+
+            if (summary) {
+                manual.summary = summary;
+            }
+
+            if (name || summary) {
+                return manual.save();
+            } else {
+                return Promise.resolve(manual);
+            }
+        })
+        .then(manual => {
+            const { steps } = req.body;
+
+            if (steps) {
+                return Step.findAll({
+                    where: {
+                        manualId: manual.id
+                    }
+                })
+                    .then(steps => {
+                        const stepsId = steps.map(step => step.id);
+
+                        return ObjectModel.destroy({
+                            where: {
+                                stepId: {
+                                    $in: stepsId
+                                }
+                            }
+                        });
+                    })
+                    .then(() => {
+                        return Step.destroy({
+                            where: {
+                                manualId: manual.id
+                            }
+                        });
+                    })
+                    .then(() => {
+                        const promises = steps.map(step =>
+                            Step.create(
+                                {
+                                    ...step,
+                                    manualId: manual.id
+                                },
+                                {
+                                    include: [ObjectModel]
+                                }
+                            )
+                        );
+
+                        return Promise.all(promises)
+                            .then(() => Promise.resolve(manual))
+                            .catch(err => Promise.reject(err));
+                    })
+                    .catch(err => Promise.reject(err));
+            } else {
+                return Promise.resolve(manual);
+            }
+        })
+        .then(manual => {
+            const { productId } = req.params;
+
+            return Manual.findOne({
+                attributes: ['id', 'name', 'summary', 'updatedAt'],
+                where: {
+                    id: manual.id,
+                    productId
+                },
+                include: [
+                    {
+                        model: Step,
+                        attributes: ['instruction', 'imageTarget'],
+                        include: [ObjectModel]
+                    }
+                ]
+            });
         })
         .then(manual => {
             res.send(manual);
