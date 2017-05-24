@@ -60,19 +60,19 @@
         "index": 0,
         "manualId": 1,
         "instruction": "Step 1 goes here",
-        "imageTarget": "target.jpg"
+        "imageTarget": "/image_targets/test.jpg"
     }, {
         "id": 2,
         "index": 1,
         "manualId": 1,
         "instruction": "Step 2 goes here",
-        "imageTarget": "target.jpg"
+        "imageTarget": "/image_targets/test.jpg"
     }, {
         "id": 3,
         "index": 0,
         "manualId": 2,
         "instruction": "But why would you want to remove the screen?",
-        "imageTarget": "target.jpg"
+        "imageTarget": "/image_targets/test.jpg"
     }],
     "objectModels": [{
         "id": 1,

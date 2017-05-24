@@ -22,13 +22,6 @@ app.use(expressValidator());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-const originWhitelist = [
-    'http://localhost:3000',
-    'http://localhost:8000',
-    'localhost:3000',
-    'localhost:8000'
-];
-
 // supply origin header if it is empty
 app.use((req, res, next) => {
     req.headers.origin = req.headers.origin || req.headers.host;
@@ -40,11 +33,8 @@ app.use(
     cors({
         credentials: true,
         origin: (origin, cb) => {
-            if (originWhitelist.filter(o => o === origin).length > 0) {
-                cb(null, true);
-            } else {
-                cb(new Error('Origin ' + origin + ' not allowed by CORS'));
-            }
+            // allow everyone
+            cb(null, true);
         }
     })
 );
