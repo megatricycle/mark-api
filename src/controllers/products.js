@@ -1,4 +1,6 @@
 import sequelize from 'sequelize';
+import fs from 'fs-promise';
+import uuidV4 from 'uuid/v4';
 
 import { Product, User, Manual, Step, ObjectModel } from '../models';
 import { validationError, resourceNotFound } from '../constants/errorTypes';
@@ -343,10 +345,39 @@ export const editManual = (req, res, next) => {
                         });
                     })
                     .then(() => {
-                        const promises = steps.map(step =>
+                        const imageTargets = steps.map(step =>
+                            step.imageTarget.replace(
+                                /^data:image\/\w+;base64,/,
+                                ''
+                            )
+                        );
+
+                        const filenames = imageTargets.map(
+                            () =>
+                                `${__dirname}/../public/image_targets/${uuidV4()}.jpg`
+                        );
+                        const publicFilenames = filenames.map(filename =>
+                            filename.substring(
+                                filename.indexOf('/image_targets')
+                            )
+                        );
+
+                        const promises = imageTargets.map((imageTarget, i) =>
+                            fs.writeFile(filenames[i], imageTarget, {
+                                encoding: 'base64'
+                            })
+                        );
+
+                        return Promise.all(promises).then(() =>
+                            Promise.resolve(publicFilenames)
+                        );
+                    })
+                    .then(publicFilenames => {
+                        const promises = steps.map((step, i) =>
                             Step.create(
                                 {
                                     ...step,
+                                    imageTarget: publicFilenames[i],
                                     manualId: manual.id
                                 },
                                 {
