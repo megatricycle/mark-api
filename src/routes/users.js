@@ -1,22 +1,9 @@
 import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import crypto from 'crypto';
+
+import uploader from '../util/uploader';
 
 const router = express.Router();
-const storage = multer.diskStorage({
-    destination: 'src/public/images',
-    filename(req, file, cb) {
-        crypto.pseudoRandomBytes(16, (err, raw) => {
-            if (err) {
-                return cb(err);
-            }
-
-            cb(null, raw.toString('hex') + path.extname(file.originalname));
-        });
-    }
-});
-const upload = multer({ storage });
+const upload = uploader('images');
 
 import * as userController from '../controllers/users';
 

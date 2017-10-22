@@ -3,6 +3,7 @@ import ProductModel from './product';
 import ManualModel from './manual';
 import StepModel from './step';
 import ObjectModelModel from './objectModel';
+import ImageTargetModel from './imageTarget';
 
 ProductModel.belongsTo(UserModel);
 UserModel.hasMany(ProductModel);
@@ -17,6 +18,7 @@ ProductModel.belongsToMany(UserModel, {
 });
 
 ProductModel.hasMany(ManualModel);
+ProductModel.hasMany(ImageTargetModel);
 
 ManualModel.hasMany(StepModel);
 
@@ -27,3 +29,4 @@ export const Product = ProductModel;
 export const Manual = ManualModel;
 export const Step = StepModel;
 export const ObjectModel = ObjectModelModel;
+export const ImageTarget = ImageTargetModel;

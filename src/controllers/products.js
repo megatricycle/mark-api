@@ -1,8 +1,13 @@
 import sequelize from 'sequelize';
-import fs from 'fs-promise';
-import uuidV4 from 'uuid/v4';
 
-import { Product, User, Manual, Step, ObjectModel } from '../models';
+import {
+    Product,
+    User,
+    Manual,
+    Step,
+    ObjectModel,
+    ImageTarget
+} from '../models';
 import { validationError, resourceNotFound } from '../constants/errorTypes';
 
 export const getProducts = (req, res, next) => {
@@ -45,7 +50,7 @@ export const getProducts = (req, res, next) => {
                         attributes: []
                     }
                 ],
-                group: ['products.id']
+                group: ['products.id', 'Subscriber.id']
             });
 
             const queryFromUsers = Product.findAll({
@@ -76,7 +81,7 @@ export const getProducts = (req, res, next) => {
                         attributes: []
                     }
                 ],
-                group: ['products.id']
+                group: ['products.id', 'Subscriber.id']
             });
 
             return Promise.all([queryFromProducts, queryFromUsers]);
@@ -152,15 +157,25 @@ export const getProduct = (req, res, next) => {
                         attributes: []
                     }
                 ],
-                group: ['products.id']
+                group: ['products.id', 'Subscriber.id']
             });
         })
         .then(resultProduct => {
             product = resultProduct;
 
-            return User.findById(req.user.id);
+            const getUser = User.findById(req.user.id);
+
+            const getImageTargets = ImageTarget.findAll({
+                where: {
+                    productId: product.id
+                }
+            });
+
+            return Promise.all([getUser, getImageTargets]);
         })
-        .then(user => {
+        .then(([user, imageTargets]) => {
+            product.dataValues = { ...product.dataValues, imageTargets };
+
             return user.hasSubscription([product]);
         })
         .then(result => {
@@ -345,39 +360,10 @@ export const editManual = (req, res, next) => {
                         });
                     })
                     .then(() => {
-                        const imageTargets = steps.map(step =>
-                            step.imageTarget.replace(
-                                /^data:image\/\w+;base64,/,
-                                ''
-                            )
-                        );
-
-                        const filenames = imageTargets.map(
-                            () =>
-                                `${__dirname}/../public/image_targets/${uuidV4()}.jpg`
-                        );
-                        const publicFilenames = filenames.map(filename =>
-                            filename.substring(
-                                filename.indexOf('/image_targets')
-                            )
-                        );
-
-                        const promises = imageTargets.map((imageTarget, i) =>
-                            fs.writeFile(filenames[i], imageTarget, {
-                                encoding: 'base64'
-                            })
-                        );
-
-                        return Promise.all(promises).then(() =>
-                            Promise.resolve(publicFilenames)
-                        );
-                    })
-                    .then(publicFilenames => {
-                        const promises = steps.map((step, i) =>
+                        const promises = steps.map(step =>
                             Step.create(
                                 {
                                     ...step,
-                                    imageTarget: publicFilenames[i],
                                     manualId: manual.id
                                 },
                                 {
@@ -415,6 +401,37 @@ export const editManual = (req, res, next) => {
         })
         .then(manual => {
             res.send(manual);
+        })
+        .catch(err => next(err));
+};
+
+export const addImageTarget = (req, res, next) => {
+    const { filename: imageFilename } = req.file;
+
+    req.checkParams('productId').notEmpty();
+
+    req
+        .getValidationResult()
+        .then(result => {
+            if (!result.isEmpty()) {
+                return Promise.reject(validationError(result));
+            }
+
+            const { productId } = req.params;
+
+            return Product.findById(productId);
+        })
+        .then(product => {
+            if (!product) {
+                return Promise.reject(resourceNotFound);
+            }
+
+            return product.createImageTarget({
+                url: `/image_targets/${imageFilename}`
+            });
+        })
+        .then(imageTarget => {
+            res.send(imageTarget);
         })
         .catch(err => next(err));
 };
