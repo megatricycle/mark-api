@@ -211,7 +211,7 @@ export const addProduct = (req, res, next) => {
                         attributes: []
                     }
                 ],
-                group: ['products.id']
+                group: ['products.id', 'Subscriber.id']
             });
         })
         .then(product => {
