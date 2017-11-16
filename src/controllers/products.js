@@ -241,7 +241,8 @@ export const getManual = (req, res, next) => {
                         attributes: ['instruction', 'imageTarget'],
                         include: [ObjectModel]
                     }
-                ]
+                ],
+                order: [[Step, 'index']]
             });
         })
         .then(manual => {
